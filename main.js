@@ -1,8 +1,31 @@
 /*
-Telegram Bot API:
+- Telegram Bot API:
   docs: https://core.telegram.org/bots/api
 
-OpenSSL:
+- Telegram api request to webhook resquest data example:
+  {
+      "update_id": 123456789,
+      "message": {
+          "message_id": 123,
+          "from": {
+              "id": 123456,
+              "is_bot": false,
+              "first_name": "John",
+              "last_name": "Doe",
+              "language_code": "en"
+          },
+          "chat": {
+              "id": 123456,
+              "first_name": "John",
+              "last_name": "Doe",
+              "type": "private"
+          },
+          "date": 1649194883,
+          "text": "/start"
+      }
+  }
+
+- Generating https keys/certificates with OpenSSL:
   - generate a private key:
     openssl genrsa -out privateKey.pem 2048
 
@@ -52,15 +75,25 @@ function webhookHandler(req, res){
       rawData+=chunk
     })
     req.on('end', ()=>{
+      const parsedData = JSON.parse(rawData)
       console.log('webhookHandler() request info: ')
-      // console.log(JSON.parse(rawData))
-      console.log(rawData)
+      console.log(parsedData)
       res.writeHead(200)
       res.end()
 
-    })
+      if(parsedData.entities.type === 'bot_command'){
+        commandHandler(parsedData)
+      }
+     })
   }
 }
+
+commandHandler(message){
+  let command = msg.entities.type.subString(msg.entities.offset, msg.entities.lenght)
+  
+}
+
+
 
 function getWebhookInfo(){
   const reqOptions = {
