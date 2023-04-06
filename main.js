@@ -91,13 +91,17 @@ function webhookHandler(req, res){
      })
   }
 }
-
+/**
+ * https://code.visualstudio.com/docs/languages/javascript#_jsdoc-support
+ * @param {Object} msg 
+ * @param {String} command 
+ */
 function commandHandler(msg, command){
   console.log('commandHandler(): '+command)
   
   const parameters = JSON.stringify({
     chat_id: msg.from.id,
-    text: msg.text
+    text:  msg.text
   })
   const reqOptions = {
     host: telegramApiHost,
