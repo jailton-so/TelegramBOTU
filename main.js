@@ -2,28 +2,23 @@
 - Telegram Bot API:
   docs: https://core.telegram.org/bots/api
 
-- Telegram api request to webhook resquest data example:
+- Telegram api request data example:
   {
-      "update_id": 123456789,
-      "message": {
-          "message_id": 123,
-          "from": {
-              "id": 123456,
-              "is_bot": false,
-              "first_name": "John",
-              "last_name": "Doe",
-              "language_code": "en"
-          },
-          "chat": {
-              "id": 123456,
-              "first_name": "John",
-              "last_name": "Doe",
-              "type": "private"
-          },
-          "date": 1649194883,
-          "text": "/start"
-      }
+  update_id: 119681188,
+  message: {
+    message_id: 103,
+    from: {
+      id: 5009220789,
+      is_bot: false,
+      first_name: 'Jailton',
+      language_code: 'en'
+    },
+    chat: { id: 5009220789, first_name: 'Jailton', type: 'private' },
+    date: 1680748299,
+    text: '/echo testing @test /echo again',
+    entities: [ { offset: 0, length: 5, type: 'bot_command' }, { offset: 14, length: 7, type: 'mention' } ]
   }
+}
 
 - Generating https keys/certificates with OpenSSL:
   - generate a private key:
@@ -42,7 +37,7 @@ const port = 443
 const telegramBotToken = '6076259682:AAEwFW9MwcwDGID0yXIeiKoR6ctNeDzx16k'
 const telegramApiHost = 'api.telegram.org'
 const telegramApiPath = '/bot'+telegramBotToken
-const webhookHost = '68ed-2804-29b8-509b-d613-391e-a2db-3774-1492.sa.ngrok.io'
+const webhookHost = 'affd-2804-29b8-509b-d613-6031-4225-ea41-519c.sa.ngrok.io'
 const webhookPath = '/webhook'
 const webhookSecretToken = 'mySecretToken123'
 
@@ -65,7 +60,6 @@ const server = https.createServer(serverOptions, (req, res) => {
 server.listen(port);console.log('listening on port '+port+'...')
 server.on('error', (error)=>{console.log('server error: '+error.message)})
 
-
 function webhookHandler(req, res){
   if(req.headers['x-telegram-bot-api-secret-token'] !== webhookSecretToken){
     console.log('invalid secret token')
@@ -81,16 +75,50 @@ function webhookHandler(req, res){
       res.writeHead(200)
       res.end()
 
-      if(parsedData.entities.type === 'bot_command'){
-        commandHandler(parsedData)
+      //check Entities in the message (like usernames (@), URLs (http://...), bot commands (/command), etc. that appear in the text)
+      if(parsedData.hasOwnProperty('message') && parsedData.message.hasOwnProperty('entities')){
+        console.log('message contains entities')
+        for(let i=0; i < parsedData.message.entities.length; i++){
+          if(parsedData.message.entities[i].type === 'bot_command'){
+            console.log(parsedData.message.entities[i].type+' detected')
+            commandHandler(parsedData.message, parsedData.message.text.substr(parsedData.message.entities[i].offset, parsedData.message.entities[i].length))
+          }
+        }
+      }
+      else{
+        console.log('no entities to handle')
       }
      })
   }
 }
 
-commandHandler(message){
-  let command = msg.entities.type.subString(msg.entities.offset, msg.entities.lenght)
+function commandHandler(msg, command){
+  console.log('commandHandler(): '+command)
   
+  const parameters = JSON.stringify({
+    chat_id: msg.from.id,
+    text: msg.text
+  })
+  const reqOptions = {
+    host: telegramApiHost,
+    path: telegramApiPath+'/sendmessage',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': parameters.length
+    }
+  }
+  const req = https.request(reqOptions, (res)=>{
+    let rawData = ''
+    res.on('data', (chunk)=>{
+      rawData+=chunk
+    })
+    res.on('end', ()=>{
+      console.log('/sendmessage response: ')
+      console.log(JSON.parse(rawData))
+    })
+  })
+  req.write(parameters)
+  req.end()
 }
 
 
