@@ -93,12 +93,7 @@ function webhookHandler(req, res){
   }
 }
 /**
-<<<<<<< HEAD
  * @param {TelegramMessage} msg 
-=======
- * https://code.visualstudio.com/docs/languages/javascript#_jsdoc-support
- * @param {Object} msg 
->>>>>>> 824b443fc131734a90a3a20acf3539fa3f9f9747
  * @param {String} command 
  */
 function commandHandler(msg, command){
@@ -106,11 +101,7 @@ function commandHandler(msg, command){
   
   const parameters = JSON.stringify({
     chat_id: msg.from.id,
-<<<<<<< HEAD
     text: msg.text.substring(msg.entities[0].length) !== '' ? msg.text.substring(msg.entities[0].length) : '*no message to echo'
-=======
-    text:  msg.text
->>>>>>> 824b443fc131734a90a3a20acf3539fa3f9f9747
   })
   const reqOptions = {
     host: telegramApiHost,
