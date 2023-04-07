@@ -101,7 +101,7 @@ function commandHandler(msg, command){
   
   const parameters = JSON.stringify({
     chat_id: msg.from.id,
-    text: msg.text.substring()
+    text: msg.text.substring(msg.entities[0].length) !== '' ? msg.text.substring(msg.entities[0].length) : '*no message to echo'
   })
   const reqOptions = {
     host: telegramApiHost,
