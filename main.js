@@ -32,12 +32,13 @@
 */
 const https = require('node:https')
 const fs = require('node:fs')
+const TelegramApiTypes = require('./telegramApiTypes')
 const port = 443
 
 const telegramBotToken = '6076259682:AAEwFW9MwcwDGID0yXIeiKoR6ctNeDzx16k'
 const telegramApiHost = 'api.telegram.org'
 const telegramApiPath = '/bot'+telegramBotToken
-const webhookHost = 'affd-2804-29b8-509b-d613-6031-4225-ea41-519c.sa.ngrok.io'
+const webhookHost = '2c86-2804-29b8-509b-d613-c523-505f-ef8a-4d9.sa.ngrok.io'
 const webhookPath = '/webhook'
 const webhookSecretToken = 'mySecretToken123'
 
@@ -91,13 +92,16 @@ function webhookHandler(req, res){
      })
   }
 }
-
+/**
+ * @param {TelegramMessage} msg 
+ * @param {String} command 
+ */
 function commandHandler(msg, command){
   console.log('commandHandler(): '+command)
   
   const parameters = JSON.stringify({
     chat_id: msg.from.id,
-    text: msg.text
+    text: msg.text.substring()
   })
   const reqOptions = {
     host: telegramApiHost,
